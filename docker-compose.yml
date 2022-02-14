@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  web:
+    build:
+      dockerfile: Dockerfile.backend
+      context: ./
+    # command: gunicorn core.wsgi --bind 0.0.0.0:8000
+    container_name: web
+    ports:
+      - "8000:8000"
+    expose:
+      - 8000
+    networks:
+      - main
+    restart: on-failure
+    depends_on:
+      - redis
+  redis:
+    image: redis:alpine
+    container_name: redis 
+    networks:
+      - main
+    ports:
+      - "6379:6379"
+    restart: on-failure
+
+  worker1:
+    build:
+      context: ./
+      dockerfile: Dockerfile.backend
+    # command: celery -A core worker -l info
+    container_name: worker1
+    depends_on:
+      - web
+      - redis
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
+    hostname: worker1
+    networks:
+      - main
+    restart: on-failure
+
+  worker2:
+    build:
+        context: ./
+        dockerfile: Dockerfile.backend
+    # command: celery -A core worker -l info -B
+    container_name: worker2
+    depends_on:
+      - web
+      - redis
+    hostname: worker2
+    networks:
+      - main
+    restart: on-failure
+
+  
+
+
+networks:
+  main:
