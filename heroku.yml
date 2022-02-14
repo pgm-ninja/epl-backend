@@ -1,19 +1,19 @@
 build:
   docker:
     web: Dockerfile.backend
-    worker1: Dockerfile.backend
-    worker2: Dockerfile.backend
+    # worker1: Dockerfile.backend
+    # worker2: Dockerfile.backend
 
 run:
   web: 
     command:
       - cd /app/prediction-app-backend && gunicorn core.wsgi --bind 0.0.0.0:$PORT
     image: web
-  worker1: 
-    command:
-      - cd /app/prediction-app-backend && celery -A core worker -l info
-    image: worker1
-  worker2: 
-    command:
-      - cd /app/prediction-app-backend && celery -A core worker -l info -B
-    image: worker2
+  # worker1: 
+  #   command:
+  #     - cd /app/prediction-app-backend && celery -A core worker -l info
+  #   image: worker1
+  # worker2: 
+  #   command:
+  #     - cd /app/prediction-app-backend && celery -A core worker -l info -B
+  #   image: worker2
